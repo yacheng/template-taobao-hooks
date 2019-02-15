@@ -1,0 +1,32 @@
+{
+  "name": "template-taobao",
+  "author": "yacheng.sz",
+  "version": "0.7.0",
+  "snapshots": [
+    "//gw.alicdn.com/tfs/TB12WTDQXXXXXXWapXXXXXXXXXX-300-200.png",
+    "//gw.alicdn.com/tfs/TB10fVvQXXXXXcWXXXXXXXXXXXX-377-667.png",
+    "//gw.alicdn.com/tfs/TB119sRPVXXXXcUXVXXXXXXXXXX-376-668.png",
+    "//gw.alicdn.com/tfs/TB13rdlQXXXXXbbXpXXXXXXXXXX-376-669.png"
+  ],
+  "description": "购物类应用",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raxjs/template-taobao.git"
+  },
+  "scripts": {
+    "start": "rax-scripts start",
+    "build": "rax-scripts build",
+    "lint": "eslint --ext .js --ext .jsx ./src"
+  },
+  "dependencies": {
+    "rax": "1.0.0-beta.8",
+    "driver-dom": "1.0.0-beta.0",
+    "universal-env": "^0.6.4"
+  },
+  "devDependencies": {
+    "rax-scripts": "^0.6.4-1",
+    "babel-eslint": "^8.2.2",
+    "eslint": "^4.18.1",
+    "eslint-plugin-react": "^7.7.0"
+  }
+}
