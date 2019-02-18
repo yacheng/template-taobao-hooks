@@ -50,7 +50,7 @@ const styles = {
 
 export default (props) => {
 
-  getContent = () => {
+  const getContent = () => {
     let list = props.dataSource,
       count = props.cells,
       renderCell = props.renderCell;
@@ -75,6 +75,6 @@ export default (props) => {
     return <View>{grids}</View>;
   }
 
-  return <View>{this.getContent()}</View>;
+  return <View>{getContent()}</View>;
 }
 

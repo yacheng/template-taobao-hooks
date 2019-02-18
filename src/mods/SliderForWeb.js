@@ -1,5 +1,7 @@
-import {createElement, cloneElement, Component, findDOMNode, PropTypes} from 'rax';
-import View from 'rax-view';
+import {createElement, useState, useRef, createRef, useEffect} from 'rax';
+import cloneElement from '../api/rax-clone-element';
+import findDOMNode from '../api/rax-find-dom-node';
+import View from '../components/View';
 import PanResponder from 'universal-panresponder';
 import SwipeEvent from './Swipe';
 import styles from './sliderStyle';
@@ -8,240 +10,215 @@ import styles from './sliderStyle';
 * @Slider Entrance
 * rax-slider h5 version
 **/
-export default class Slide extends Component {
-  static propTypes = {
-    onChange: PropTypes.func,
-    paginationStyle: PropTypes.object
+export default (props) => {
+
+  let index = 0,
+    thisHeight = null,
+    thisWidth = null,
+    loopIdx = 0,
+    DIRECTION = {
+      LEFT: 'SWIPE_LEFT',
+      RIGHT: 'SWIPE_RIGHT'
+    },
+    offsetX = null,
+    isSwiping = false,
+    autoPlayTimer = null,
+    total = 0;
+
+  const [paginationIndex, setPaginationIndex] = useState(index);
+  const swipeView = useRef(null), childViewList = [];
+  for (var i = 0 ; i< props.children.length ; i++) {
+    childViewList.push(useRef(null));
   }
 
-  static defaultProps = {
-    horizontal: true,
-    showsPagination: true,
-    loop: true,
-    autoPlay: false,
-    autoplayInterval: 3000,
-    index: 0,
-    paginationStyle: null,
-    initialVelocityThreshold: 0.7,
-    verticalThreshold: 10,
-    horizontalThreshold: 10,
-    vertical: false
-  }
-
+  const {children, height, width} = props;
+  if (children.length < 2) return;
   index = 0;
-  height = null;
-  width = null;
+  thisHeight = height;
+  thisWidth = parseFloat(width) * document.documentElement.clientWidth / 750;
   loopIdx = 0;
-  DIRECTION = {
-    LEFT: 'SWIPE_LEFT',
-    RIGHT: 'SWIPE_RIGHT'
-  };
-  offsetX = null;
-  isSwiping = false;
-  total = 0;
+  total = children.length;
 
-  componentWillMount() {
-    const {children, height, width} = this.props;
-    if (children.length < 2) return;
-    this.index = 0;
-    this.height = height;
-    this.width = parseFloat(width) * document.documentElement.clientWidth / 750;
-    this.loopIdx = 0;
-    this.total = children.length;
-  }
-
-  componentDidMount() {
-    if (this.props.autoPlay && this.total > 1) {
-      this.autoPlay();
+  useEffect(() => {
+    if (props.autoPlay && total > 1) {
+      autoPlay();
     }
-  }
+  });
 
-  autoPlay() {
-    const autoplayInterval = this.props.autoplayInterval;
+  const autoPlay = () => {
+    const autoplayInterval = props.autoplayInterval || 3000;
     // 非自动播放的情况 return 掉
-    if (this.isSwiping) return;
-    this.autoPlayTimer && clearInterval(this.autoPlayTimer);
-    this.autoPlayTimer = setInterval(() => {
-      if (this.isLoopEnd()) return;
+    if (isSwiping) return;
+    autoPlayTimer && clearInterval(autoPlayTimer);
+    autoPlayTimer = setInterval(() => {
+      if (isLoopEnd()) return;
       // 根据 index 和偏移改变位置
-      this.slideTo(this.index, this.DIRECTION.LEFT);
+      slideTo(DIRECTION.LEFT);
     }, parseFloat(autoplayInterval));
   }
 
   // 改变 slider 的框子位置
-  slideTo(index, direction) {
-    if (this.isSwiping) return;
+  const slideTo = (direction) => {
+    if (isSwiping) return;
 
-    // this.index = direction === this.DIRECTION.LEFT ? index + 1 : (index - 1 < 0 ? this.total + index - 1 : index - 1);
-    this.index = direction === this.DIRECTION.LEFT ? index + 1 : index - 1;
-    this.offsetX = this.index * this.width;
+    // index = direction === DIRECTION.LEFT ? index + 1 : (index - 1 < 0 ? total + index - 1 : index - 1);
+    index = direction === DIRECTION.LEFT ? index + 1 : index - 1;
+    if (index < 0) {
+      index = props.children.length -1;
+    } else if (index >= props.children.length) {
+      index = 0;
+    }
+    offsetX = index * thisWidth;
 
-    const realIndex = this.loopedIndex();
+    const realIndex = loopedIndex();
 
     // 外框translate3d for translate3d 为了性能
-    let swipeView = findDOMNode(this.refs.swipeView);
-    const styleText = `translate3d(${-1 * this.offsetX}px, 0px, 0px)`;
-    swipeView.style.transform = styleText;
-    swipeView.style.webkitTransform = styleText;
-
-    this.loopIdx = this.index < 0 && realIndex !== 0 ? this.total - realIndex : realIndex;
-    let childNum = 'child' + this.loopIdx;
-    let childView = findDOMNode(this.refs[childNum]);
-    childView.style.left = this.offsetX + 'px';
-
-    this.props.onChange({index: this.loopIdx});
-    this.setState({
-      offsetX: this.offsetX
-    });
+    const styleText = `translate3d(${-1 * offsetX}px, 0px, 0px)`;
+    findDOMNode(swipeView.current).style.transform = styleText;
+    findDOMNode(swipeView.current).style.webkitTransform = styleText;
+    props.onChange && props.onChange({index: index});
+    setPaginationIndex(index);
   }
 
-  onSwipeBegin = () => {
-    this.isSwiping = true;
-    clearInterval(this.autoPlayTimer);
+  const onSwipeBegin = () => {
+    isSwiping = true;
+    clearInterval(autoPlayTimer);
   }
 
-  isLoopEnd() {
-    const realIndex = this.loopedIndex();
-    const num = this.total;
-    if (!this.props.loop && (realIndex === num - 1 || realIndex === 0) ) {
+  const isLoopEnd = () => {
+    const realIndex = loopedIndex();
+    const num = total;
+    if (!props.loop && (realIndex === num - 1 || realIndex === 0) ) {
       return true;
     }
     return false;
   }
 
-  onSwipe = ({ direction, distance, velocity }) => {
-    if (this.isLoopEnd()) return;
-    let changeX = distance - this.offsetX;
-    let swipeView = findDOMNode(this.refs.swipeView);
+  const onSwipe = ({ direction, distance, velocity }) => {
+    if (isLoopEnd()) return;
+    let changeX = distance - offsetX;
     const styleText = `translate3d(${changeX}px, 0px, 0px)`;
-    swipeView.style.transform = styleText;
-    swipeView.style.webkitTransform = styleText;
+    swipeView.current.style.transform = styleText;
+    swipeView.current.style.webkitTransform = styleText;
   }
 
-  onSwipeEnd = ({ direction, distance, velocity }) => {
-    this.isSwiping = false;
-    this.slideTo(this.index, direction);
-    if (this.props.autoPlay) {
-      this.autoPlay();
+  const onSwipeEnd = ({ direction, distance, velocity }) => {
+    isSwiping = false;
+    slideTo(index, direction);
+    if (props.autoPlay) {
+      autoPlay();
     }
   }
 
   // 使index维持在0-length之间循环
-  loopedIndex(index, total) {
-    index = index || this.index;
-    total = total || this.total;
+  const loopedIndex = (index, total) => {
+    index = index || index;
+    total = total || total;
     return Math.abs(index) % total;
   }
 
-  renderPagination() {
-    let props = this.props;
-    if (this.total <= 1) return;
+  const renderPagination = () => {
+    if (total <= 1) return;
 
     Object.assign(styles.defaultPaginationStyle, props.paginationStyle);
     let {itemSelectedColor, itemColor, itemSize} = styles.defaultPaginationStyle;
 
-    const activeStyle = [
-      styles.activeDot,
-      {
+    const activeStyle = {
+      ...styles.activeDot,
+      ...{
         backgroundColor: itemSelectedColor,
         width: itemSize,
         height: itemSize
       }
-    ];
+    };
 
-    const normalStyle = [
-      styles.normalDot,
-      {
+    const normalStyle = {
+      ...styles.normalDot,
+      ...{
         backgroundColor: itemColor,
         width: itemSize,
         height: itemSize
       }
-    ];
+    };
 
     let dots = [];
-    const ActiveDot = this.props.activeDot || <View style={activeStyle} />;
-    const NormalDot = this.props.normalDot || <View style={normalStyle} />;
-    const realIndex = this.loopIdx;
+    const ActiveDot = props.activeDot || <View style={activeStyle} />;
+    const NormalDot = props.normalDot || <View style={normalStyle} />;
+    const realIndex = paginationIndex;
 
-    for (let i = 0; i < this.total; i++) {
-      dots.push(i === realIndex
-        ? cloneElement(ActiveDot, {key: i})
-        : cloneElement(NormalDot, {key: i}));
+    for (let i = 0; i < total; i++) {
+      dots.push(i === realIndex ? cloneElement(ActiveDot, {key: i}) : cloneElement(NormalDot, {key: i}));
     }
 
     return (
-      <View style={[
-        styles.defaultPaginationStyle,
-        props.paginationStyle
-      ]}>
+      <View id="pagination" style={{
+        ...styles.defaultPaginationStyle,
+        ...props.paginationStyle
+      }}>
         {dots}
       </View>
     );
   }
 
-  getPages = () => {
-    const children = this.props.children;
+  let getPages = () => {
+    const children = props.children;
     if (!children.length || children.length <= 1) {
       return <View style={styles.childrenStyle}>{children}</View>;
     }
 
     return children.map((child, index) => {
-      let refStr = 'child' + index;
       let translateStyle = {
-        width: this.width + 'px',
-        height: this.height,
-        left: index * this.width + 'px'
+        width: thisWidth + 'px',
+        height: thisHeight,
+        left: index * thisWidth + 'px'
       };
       return (
-        <View ref={refStr} className={'childWrap' + index}
-          style={[styles.childrenStyle, translateStyle]} key={index}>
+        <View ref={childViewList[index]} className={'childWrap' + index}
+          style={{...styles.childrenStyle, ...translateStyle}} key={index}>
           {child}
         </View>
       );
     });
   }
 
-  renderSwipeView(pages) {
+  let renderSwipeView = (pages) => {
     const {
       initialVelocityThreshold,
       verticalThreshold,
       vertical,
       horizontalThreshold,
-      children
-    } = this.props;
-    const style = {
-      width: this.width + 'px',
-      height: this.height
+      children,
+      style
+    } = props;
+    const thisStyle = {
+      width: thisWidth * children.length + 'px',
     };
 
     return children.length && children.length > 1 ?
       <SwipeEvent style={[styles.swipeWrapper, style]}
-        onSwipeBegin={this.onSwipeBegin}
-        onSwipeEnd={this.onSwipeEnd}
-        onSwipe={this.onSwipe}
+        onSwipeBegin={onSwipeBegin}
+        onSwipeEnd={onSwipeEnd}
+        onSwipe={onSwipe}
         initialVelocityThreshold={initialVelocityThreshold}
         verticalThreshold={verticalThreshold}
         vertical={vertical}
         horizontalThreshold={horizontalThreshold}>
-        <View ref="swipeView" style={[styles.swipeStyle, style]}>
+        <div id="swipeView" ref={swipeView} style={{...styles.swipeStyle, ...style, ...thisStyle}}>
           {pages}
-        </View>
+        </div>
       </SwipeEvent>
       :
-      <View ref="swipeView" style={[styles.swipeStyle, style]}>
+      <View ref={swipeView} style={{...styles.swipeStyle, ...style, ...thisStyle}}>
         {pages}
       </View>
     ;
   }
 
-  render() {
-    const that = this;
-    const {style, showsPagination} = this.props;
-    return (
-      <View style={[styles.slideWrapper, style]}>
-        {this.renderSwipeView(this.getPages())}
-        {showsPagination ? this.renderPagination() : ''}
-      </View>
-    );
-  }
+  const {style, showsPagination} = props;
+  return (
+    <View style={[styles.slideWrapper, style]}>
+      {renderSwipeView(getPages())}
+      {showsPagination ? renderPagination() : ''}
+    </View>
+  );
 };

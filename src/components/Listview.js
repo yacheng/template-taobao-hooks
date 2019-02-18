@@ -6,20 +6,6 @@ const SCROLLVIEW_REF = 'scrollview';
 
 export default (props) => {
 
-  const ref = useRef(null);
-
-  this.scrollTo = (options) => {
-    if (ref.current) {
-      ref.current.scrollTo(options);
-    }
-  }
-
-  this.resetScroll = () => {
-    if (ref.current) {
-      ref.current.resetScroll();
-    }
-  }
-
   let {
     renderScrollComponent,
     renderHeader,
@@ -37,7 +23,6 @@ export default (props) => {
   let thisProps = {
     ...props,
     ...{
-      ref,
       children: [].concat(header, body, footer),
       _autoWrapCell: true,
     },

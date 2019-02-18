@@ -12,7 +12,6 @@ export default (props) => {
     return [ref,clickHandle]
   }
   let [divEl, clickHandle] = useRefHandle(null);
-  console.log('divEl', divEl);
 
   return <div ref={divEl} onClick={clickHandle} {...props} style={styleProps} />;
 }

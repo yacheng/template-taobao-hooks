@@ -8,6 +8,8 @@ export default {
   },
   swipeStyle: {
     position: 'relative',
+    flexDirection:' row',
+    justifyContent: 'flex-start',
     transform: 'translate3d(0,0,0)',
     transition: 'all .5s ease'
   },

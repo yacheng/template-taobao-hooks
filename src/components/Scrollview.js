@@ -13,7 +13,7 @@ let ScrollView = (props) => {
   let lastScrollContentSize = 0;
   let loadmoreretry = 1;
 
-  this.handleScroll = (e) => {
+  const thisHandleScroll = (e) => {
     if (props.onScroll) {
       e.nativeEvent = {
         get contentOffset() {
@@ -57,47 +57,6 @@ let ScrollView = (props) => {
     }
   }
 
-  this.resetScroll = () => {
-    lastScrollContentSize = 0;
-    lastScrollDistance = 0;
-  }
-
-  this.scrollTo = (options) => {
-    let x = parseInt(options.x);
-    let y = parseInt(options.y);
-    let animated = options && typeof options.animated !== 'undefined' ? options.animated : true;
-
-    let pixelRatio = document.documentElement.clientWidth / FULL_WIDTH;
-    let scrollView = findDOMNode(this.refs.scroller);
-    let scrollLeft = scrollView.scrollLeft;
-    let scrollTop = scrollView.scrollTop;
-
-    if (animated) {
-      let timer = new Timer({
-        duration: 400,
-        easing: 'easeOutSine',
-        onRun: (e) => {
-          if (x >= 0) {
-            scrollView.scrollLeft = scrollLeft + e.percent * (x * pixelRatio - scrollLeft);
-          }
-          if (y >= 0) {
-            scrollView.scrollTop = scrollTop + e.percent * (y * pixelRatio - scrollTop);
-          }
-        }
-      });
-      timer.run();
-    } else {
-      if (x >= 0) {
-        findDOMNode(this.refs.scroller).scrollLeft = pixelRatio * x;
-      }
-
-      if (y >= 0) {
-        findDOMNode(this.refs.scroller).scrollTop = pixelRatio * y;
-      }
-    }
-    
-  }
-
   let {
     id,
     style,
@@ -119,7 +78,7 @@ let ScrollView = (props) => {
   ];
 
   // bugfix: fix scrollview flex in ios 78
-  if (!isWeex && !props.horizontal) {
+  if (!props.horizontal) {
     contentContainerStyle.push(styles.containerWebStyle);
   }
 
@@ -160,7 +119,7 @@ let ScrollView = (props) => {
 
   let showsScrollIndicator = props.horizontal ? showsHorizontalScrollIndicator : showsVerticalScrollIndicator;
 
-  let handleScroll = this.handleScroll;
+  let handleScroll = thisHandleScroll;
   if (scrollEventThrottle) {
     handleScroll = throttle(handleScroll, scrollEventThrottle);
   }
