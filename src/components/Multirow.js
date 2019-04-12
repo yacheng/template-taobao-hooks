@@ -1,5 +1,5 @@
 import {createElement, useState} from 'rax';
-import View from '../components/View';
+import View from 'rax-view';
 
 const Col = (props) => {
   let {
@@ -71,7 +71,6 @@ export default (props) => {
         grids.push(<Row style={props.rowStyle}>{gridDataArr[index]}</Row>);
       }
     };
-
     return <View>{grids}</View>;
   }
 

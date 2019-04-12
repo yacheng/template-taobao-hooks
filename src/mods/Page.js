@@ -1,10 +1,10 @@
 import {createElement, useState} from 'rax';
-import View from '../components/View';
+import View from 'rax-view';
 
 export default (props) => {
   let style = {
     position: 'absolute',
-    top: 0,
+    top: '0rem',
     right: 0,
     bottom: 0,
     left: 0,
@@ -12,7 +12,7 @@ export default (props) => {
   };
 
   return (
-    <View {...props} style={style}>
+    <View id="page" {...props} style={style}>
       {props.children}
     </View>
   );
