@@ -1,5 +1,5 @@
 import {createElement, useState} from 'rax';
-import View from '../components/View';
+import View from 'rax-view';
 
 export default (props) => {
   let style = props.style || {};

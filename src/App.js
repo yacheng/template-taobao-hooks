@@ -2,23 +2,29 @@ import {createElement, useState, useRef} from 'rax';
 import Page from './mods/Page';
 import FlowView from './mods/FlowView';
 import emitter from './mods/Emitter';
-import Slider from './mods/Slider';
 import Icon from './components/Icon';
 import MultiRow from './components/Multirow';
 import data from './data';
-import View from './components/View';
-import Text from './components/Text';
-import Image from './components/Image';
-import ScrollView from './components/Scrollview';
+import View from 'rax-view';
+import Text from 'rax-text';
+import Image from 'rax-image';
+import Slider from 'rax-slider';
+import ScrollView from 'rax-scrollview';
 import ListView from './components/Listview';
-import './App.css';
+import styles from './AppCss.js';
 
 function App(props) {
   const initialValue = 0;
-  const [ count, setCount ] = useState(initialValue);
+  const [ likeListdata, setLikeListdata ] = useState([]);
+
+  setTimeout(() => {
+    setLikeListdata(data.likeListdata);
+  }, 1000)
+
   window.__global_rem_unit__ = 0.5;
 
   const handleLoadMore = (e) => {
+    console.log('list loadmore');
     emitter.emit('pageDidReachEnd', e);
   }
 
@@ -27,17 +33,17 @@ function App(props) {
   }
 
   const onchange = () => {
-    console.log('slider onchange');
+    // console.log('slider onchange');
   }
+
 
   return (
     <Page>
-
-      <View className={'header'}>
-        <Image className={'headerIcon'} source={{uri: data.headerData.logo}} />
-        <View className={'headerPlaceholder'}>
-          <Icon className={'headerPlaceholderIcon'} fontFamily="iconfont" source={{uri: data.iconfont, codePoint: '\uE603'}} />
-          <Text className={'headerPlaceholderText'}>寻找宝贝店铺</Text>
+      <View style={styles.header}>
+        <Image style={styles.headerIcon} source={{uri: data.headerData.logo}} />
+        <View id="aaaaa" style={styles.headerPlaceholder}>
+          <Icon id="a1" style={styles.headerPlaceholderIcon} fontFamily="iconfont" source={{uri: data.iconfont, codePoint: '\uE603'}} />
+          <Text id="a2" style={styles.headerPlaceholderText}>寻找宝贝店铺</Text>
         </View>
       </View>
 
@@ -45,34 +51,33 @@ function App(props) {
         onEndReached={handleLoadMore}
       >
 
-        <Slider className="slider" width="750rem" height="450rem" className={'slider'}
+        <Slider className="slider" width="750rem" height="450rem" style={styles.slider}
           autoPlay={true}
           loop={true}
           showsPagination={true}
-          paginationStyle={'sliderPaginationStyle'}
+          paginationStyle={styles.sliderPaginationStyle}
           autoplayTimeout={3000}
           onChange={onchange}>
           {
             data.sliderData.map((url, index) => {
               return (
-                <View key={'slider' + index} className={'sliderItemWrap'}>
-                  <Image className={'sliderImage'} source={{uri: url}} />
+                <View key={'slider' + index} style={styles.sliderItemWrap}>
+                  <Image style={styles.sliderImage} source={{uri: url}} />
                 </View>
               );
             })
           }
         </Slider>
 
-
-        <View className={'appList'}>
+        <View style={styles.appList}>
           <MultiRow
             dataSource={data.appListData}
             cells={5}
             renderCell={(item, index) => {
               return (
-                <View className={'appItem'}>
-                  <Image className={'appIcon'} source={{uri: item.icon}} />
-                  <Text className={'appName'}>{item.name}</Text>
+                <View style={styles.appItem}>
+                  <Image style={styles.appIcon} source={{uri: item.icon}} />
+                  <Text style={styles.appName}>{item.name}</Text>
                 </View>
               );
             }
@@ -80,55 +85,55 @@ function App(props) {
         </View>
 
 
-        <View className={'toutiao'}>
-          <View className={'toutiaoLogoBox'}>
-            <Image className={'toutiaoLogo'} source={{uri: data.toutiaoData.logo}} />
+        <View style={styles.toutiao}>
+          <View style={styles.toutiaoLogoBox}>
+            <Image style={styles.toutiaoLogo} source={{uri: data.toutiaoData.logo}} />
           </View>
-          <Text className={'toutiaoTip'}>最新</Text>
-          <Text className={'toutiaoText'}>手持云台哪家强？小编推荐帮你忙！</Text>
+          <Text style={styles.toutiaoTip}>最新</Text>
+          <Text style={styles.toutiaoText}>手持云台哪家强？小编推荐帮你忙！</Text>
         </View>
-        <View className={'bottom'} />
+        <View style={styles.bottom} />
 
 
-        <View className={'vertical'}>
-          <View className={'taoqianggou'}>
-            <Image className={'taoqianggouImage'} source={{uri: data.verticalData.taoqianggouBg}} />
+        <View style={styles.vertical}>
+          <View style={styles.taoqianggou}>
+            <Image style={styles.taoqianggouImage} source={{uri: data.verticalData.taoqianggouBg}} />
           </View>
-          <View className={'verticalGroup'}>
+          <View style={styles.verticalGroup}>
             <MultiRow
               dataSource={data.verticalData.group}
               cells={2}
               renderCell={(item, index) => {
-                let boxStyle, imageStyle = 'verticalGroupImageLine1';
+                let boxStyle, imageStyle = styles.verticalGroupImageLine1;
                 if (index >= 2) {
-                  imageStyle = 'verticalGroupImageLine2';
-                  boxStyle = 'verticalGroupBox3';
+                  imageStyle = styles.verticalGroupImageLine2;
+                  boxStyle = styles.verticalGroupBox3;
                 }
                 if (index == 5) {
-                  boxStyle = 'verticalGroupBox4';
+                  boxStyle = styles.verticalGroupBox4;
                 }
                 return (
-                  <View className={boxStyle}>
-                    <Image className={imageStyle} source={{uri: item}} />
+                  <View style={boxStyle}>
+                    <Image style={imageStyle} source={{uri: item}} />
                   </View>
                 );
               }
               } />
           </View>
         </View>
-        <View className={'bottom'} />
+        <View style={styles.bottom} />
 
 
-        <Image className={'banner'} source={{uri: data.banner}} />
-        <View className={'bottom'} />
+        <Image style={styles.banner} source={{uri: data.banner}} />
+        <View style={styles.bottom} />
 
 
         <ListView
           renderHeader={() => {
             return (
-              <View className={'likeListHeader'}>
-                <Text className={'likeListHeaderTitle'}>猜你喜欢</Text>
-                <Text className={'likeListHeaderText'}>实时推荐最适合你的宝贝</Text>
+              <View style={styles.likeListHeader}>
+                <Text style={styles.likeListHeaderTitle}>猜你喜欢</Text>
+                <Text style={styles.likeListHeaderText}>实时推荐最适合你的宝贝</Text>
               </View>
             );
           }}
@@ -137,16 +142,16 @@ function App(props) {
           }}
           renderRow={(item) => {
             return (
-              <View className={'likeListItem'}>
+              <View style={styles.likeListItem}>
                 <MultiRow
                   dataSource={item}
                   cells={2}
                   renderCell={(itemInfo, index) => {
                     return (
                       <View>
-                        <Image className={'likeListImage'} source={{uri: itemInfo.image}} />
-                        <Text className={'likeListTitle'} numberOfLines={2}>{itemInfo.title}</Text>
-                        <Text className={'likeListPrice'}>{itemInfo.price}</Text>
+                        <Image style={styles.likeListImage} source={{uri: itemInfo.image}} />
+                        <Text style={styles.likeListTitle} numberOfLines={2}>{itemInfo.title}</Text>
+                        <Text style={styles.likeListPrice}>{itemInfo.price}</Text>
                       </View>
                     );
                   }
@@ -154,24 +159,24 @@ function App(props) {
               </View>
             );
           }}
-          dataSource={data.likeListdata}
+          dataSource={likeListdata}
           onEndReached={handleLoadMoreInside}
         />
-        <View className={'bottom'} />
+        <View style={styles.bottom} />
 
 
       </ScrollView>
 
 
-      <View className={'bottomBar'}>
+      <View style={styles.bottomBar}>
         <MultiRow
           dataSource={data.barData}
           cells={5}
           renderCell={(item, index) => {
             return (
-              <View className={'bottomBarItem'}>
-                <Icon className={'bottomBarIcon'} fontFamily="iconfont" source={{uri: data.iconfont, codePoint: item.icon}} />
-                <Text className={'bottomBarText'}>{item.text}</Text>
+              <View style={styles.bottomBarItem}>
+                <Icon style={styles.bottomBarIcon} fontFamily="iconfont" source={{uri: data.iconfont, codePoint: item.icon}} />
+                <Text style={styles.bottomBarText}>{item.text}</Text>
               </View>
             );
           }

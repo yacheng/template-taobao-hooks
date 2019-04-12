@@ -1,7 +1,7 @@
 {
-  "name": "template-taobao",
+  "name": "template-taobao-hooks",
   "author": "yacheng.sz",
-  "version": "0.7.0",
+  "version": "1.0.0",
   "snapshots": [
     "//gw.alicdn.com/tfs/TB12WTDQXXXXXXWapXXXXXXXXXX-300-200.png",
     "//gw.alicdn.com/tfs/TB10fVvQXXXXXcWXXXXXXXXXXXX-377-667.png",
@@ -15,16 +15,25 @@
   },
   "scripts": {
     "start": "rax-scripts start",
+    "startweex": "rax-scripts start --type=weexapp",
     "build": "rax-scripts build",
+    "buildweex": "rax-scripts build --type=weexapp",
     "lint": "eslint --ext .js --ext .jsx ./src"
   },
   "dependencies": {
-    "rax": "1.0.0-beta.8",
-    "driver-dom": "1.0.0-beta.0",
+    "rax": "^1.0.1",
+    "rax-text": "1.0.0-beta.4",
+    "rax-view": "1.0.0-beta.0",
+    "rax-image": "1.0.0-beta.1",
+    "rax-slider": "1.0.0-beta.2",
+    "rax-scrollview": "1.0.0-beta.1",
+    "driver-dom": "1.0.0",
+    "driver-weex": "1.0.0",
+    "rax-find-dom-node": "1.0.0",
     "universal-env": "^0.6.4"
   },
   "devDependencies": {
-    "rax-scripts": "^0.6.4-1",
+    "rax-scripts": "^1.2.0",
     "babel-eslint": "^8.2.2",
     "eslint": "^4.18.1",
     "eslint-plugin-react": "^7.7.0"

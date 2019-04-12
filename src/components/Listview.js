@@ -1,6 +1,6 @@
 import {createElement, useState, useRef} from 'rax';
-import View from '../components/View';
-import RecyclerView from '../components/Scrollview';
+import View from 'rax-view';
+import RecyclerView from 'rax-scrollview';
 
 const SCROLLVIEW_REF = 'scrollview';
 
