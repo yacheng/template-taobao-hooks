@@ -60,7 +60,6 @@ function App(props) {
           <Text ref={headerPlaceholderRef} style={styles.headerPlaceholderText}>寻找宝贝店铺</Text>
         </View>
       </View>
-
       <ScrollView
         onEndReached={handleLoadMore}
       >
