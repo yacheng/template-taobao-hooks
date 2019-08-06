@@ -1,6 +1,7 @@
 /**
  * Driver for Web DOM
  **/
+import flattenStyle from './flattenStyle';
 const DANGEROUSLY_SET_INNER_HTML = 'dangerouslySetInnerHTML';
 const CLASS_NAME = 'className';
 const CLASS = 'class';
@@ -296,9 +297,22 @@ export function setAttribute(node, propKey, propValue) {
 
 export function setStyle(node, style) {
   let nodeStyle = node.style;
+  // style={...{}, ...{}} style={[{}, {}]}
+  if (style && (Array.isArray(style) || typeof style === 'object')) {
+    style = flattenStyle(style);
+  }
   for (let prop in style) {
     let propValue = style[prop];
-    nodeStyle[prop] = typeof propValue === 'number' && !UNITLESS_NUMBER_PROPS[prop] ? (propValue/100) + 'rem' : propValue;
+    nodeStyle[prop] = typeof propValue === 'number' && !UNITLESS_NUMBER_PROPS[prop] ? (propValue/100) + 'rem' : propValue;      
+  }
+  // style={{'0': {}, '1': {}}}
+  for (let prop in style) {
+    if (typeof style[prop] === 'object') {
+      for (let itemProp in style[prop]) {
+        let propValue = style[prop][itemProp];
+        nodeStyle[itemProp] = typeof propValue === 'number' && !UNITLESS_NUMBER_PROPS[prop] ? (propValue/100) + 'rem' : propValue;      
+      }
+    }
   }
 }
 
@@ -327,4 +341,3 @@ export function afterRender({ container }) {
     isHydrating = false;
   }
 }
-fps: 57

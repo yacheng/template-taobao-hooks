@@ -1,4 +1,4 @@
-import {createElement, useState, useRef} from 'rax';
+import {createElement, useState, useRef, useEffect} from 'rax';
 import Page from './mods/Page';
 import FlowView from './mods/FlowView';
 import emitter from './mods/Emitter';
@@ -8,6 +8,7 @@ import data from './data';
 import View from 'rax-view';
 import Text from 'rax-text';
 import Image from 'rax-image';
+import Picture from './components/Picture';
 import Slider from 'rax-slider';
 import ScrollView from 'rax-scrollview';
 import ListView from './components/Listview';
@@ -16,15 +17,24 @@ import styles from './AppCss.js';
 function App(props) {
   const initialValue = 0;
   const [ likeListdata, setLikeListdata ] = useState([]);
+  const [ logoImage, setLogoImage ] = useState(data.headerData.logo);
+  const headerRef = useRef(null);
+  const headerPlaceholderRef = useRef(null);
 
   setTimeout(() => {
     setLikeListdata(data.likeListdata);
-  }, 1000)
+  }, 1000);
+
+  // setTimeout(() => {
+  //   setLogoImage('//img.alicdn.com/imgextra/i4/3361811308/TB2pJ.qhJnJ8KJjSszdXXaxuFXa_!!3361811308.jpg');
+  // }, 2000);
 
   window.__global_rem_unit__ = 0.5;
 
   const handleLoadMore = (e) => {
     console.log('list loadmore');
+    console.log('headerRef', headerRef);
+    console.log('headerPlaceholderRef', headerPlaceholderRef);
     emitter.emit('pageDidReachEnd', e);
   }
 
@@ -39,14 +49,17 @@ function App(props) {
 
   return (
     <Page>
-      <View style={styles.header}>
-        <Image style={styles.headerIcon} source={{uri: data.headerData.logo}} />
-        <View id="aaaaa" style={styles.headerPlaceholder}>
-          <Icon id="a1" style={styles.headerPlaceholderIcon} fontFamily="iconfont" source={{uri: data.iconfont, codePoint: '\uE603'}} />
-          <Text id="a2" style={styles.headerPlaceholderText}>寻找宝贝店铺</Text>
+      <View ref={headerRef} style={styles.header}>
+        <Picture 
+          style={styles.headerIcon} 
+          source={{uri: logoImage}} 
+          resizeMode={'cover'}
+        />
+        <View style={styles.headerPlaceholder}>
+          <Icon style={styles.headerPlaceholderIcon} fontFamily="iconfont" source={{uri: data.iconfont, codePoint: '\uE603'}} />
+          <Text ref={headerPlaceholderRef} style={styles.headerPlaceholderText}>寻找宝贝店铺</Text>
         </View>
       </View>
-
       <ScrollView
         onEndReached={handleLoadMore}
       >
@@ -187,6 +200,5 @@ function App(props) {
     </Page>
   );
 }
-
 
 export default App;

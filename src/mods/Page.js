@@ -4,10 +4,9 @@ import View from 'rax-view';
 export default (props) => {
   let style = {
     position: 'absolute',
-    top: '0rem',
-    right: 0,
+    top: 0,
     bottom: 0,
-    left: 0,
+    width: 750,
     ...props.style,
   };
 
